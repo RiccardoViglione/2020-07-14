@@ -5,9 +5,13 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.SquadraMigliore;
+import it.polito.tdp.PremierLeague.model.SquadraPeggiore;
+import it.polito.tdp.PremierLeague.model.Team;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -35,7 +39,7 @@ public class FXMLController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbSquadra"
-    private ComboBox<?> cmbSquadra; // Value injected by FXMLLoader
+    private ComboBox<Team> cmbSquadra; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
@@ -48,12 +52,38 @@ public class FXMLController {
 
     @FXML
     void doClassifica(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	if (!model.grafoCreato()) {
+    		this.txtResult.setText("Errore, creare prima il grafo");
+    		return;
+    	}
+    	Team team = this.cmbSquadra.getValue();
+    	if (team==null) {
+    		this.txtResult.setText("Errore, selezionare una squadra");
+    		return;
+    	}
+    	List<SquadraPeggiore> r1=model.SquadreBattute(team);
+    	List<SquadraMigliore> r2=model.SquadreCheBattono(team);
+    	this.txtResult.appendText("Squadre arrivate sotto "+team.toString()+":\n");
+    	for (SquadraPeggiore t : r1) {
+    		this.txtResult.appendText(t.getT().toString()+" - "+t.getPeso()+"\n");
+    	}
+    	this.txtResult.appendText("\n");
+    	this.txtResult.appendText("Squadre arrivate sopra "+team.toString()+":\n");
+    	for (SquadraMigliore t : r2) {
+    		this.txtResult.appendText(t.getT().toString()+" - "+t.getPeso()+"\n");
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	txtResult.clear();
+    	this.model.creaGrafo();
+    	
+    	txtResult.appendText("Grafo creato!\n");
+    	txtResult.appendText("# Vertici : " + this.model.nVertici() + "\n");
+    	txtResult.appendText("# Archi : " + this.model.nArchi() + "\n");
+this.cmbSquadra.getItems().addAll(this.model.getVertici());
     }
 
     @FXML
